@@ -1,23 +1,23 @@
-@if(moveInfo){
+@if(move){
 <div class="body">
     <div class="top">
-        <h2 class="move-name">{{moveInfo.name}}</h2>
-        <img class="type" [src]="'assets/moves/' + moveInfo.type.name + '.png'" alt="move damage class">
+        <h2 class="move-name">{{move.name}}</h2>
+        <img class="type" [src]="'assets/moves/' + move.type.name + '.png'" alt="move damage class">
     </div>
 
-    <h3>Power : {{moveInfo.power || '--'}}</h3>
+    <h3>Power : {{move.power || '--'}}</h3>
 
-    <h3>Accuracy : {{moveInfo.accuracy || '--'}}</h3>
+    <h3>Accuracy : {{move.accuracy || '--'}}</h3>
 
     <div class="wrapper atk-type-container">
-        <h3>Attack type : {{moveInfo.damage_class.name}}</h3>
-        <img class="atkType" [src]="'assets/moves/damage-class/' + moveInfo.damage_class.name + '.png'"
+        <h3>Attack type : {{move.damage_class.name}}</h3>
+        <img class="atkType" [src]="'assets/moves/damage-class/' + move.damage_class.name + '.png'"
             alt="move damage class">
     </div>
 
-    <p class="description">{{moveInfo.effect_entries[0].effect}}</p>
+    <p class="description">{{move.effect_entries[0].effect}}</p>
 
-    @if(moveInfo.damage_class.name !== 'status' && typeMultipliers){
+    @if(move.damage_class.name !== 'status' && typeMultipliers){
     <div class="types-relations">
         <h3>Type Relations</h3>
         <span class="table">
