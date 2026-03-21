@@ -14,7 +14,8 @@ export class PokeAPIService {
 
 
   setInfosOnPokemon(pokemon: Pokemon): Promise<void> {
-    let pokemonName = pokemon.name.toLocaleLowerCase() === "jellicent"? "jellicent": pokemon.name;
+    let pokemonName = pokemon.name.toLocaleLowerCase() === "jellicent"? "jellicent-male": pokemon.name;
+    console.log(pokemonName);
     return new Promise((resolve, reject) => {
       this.http.get('https://pokeapi.co/api/v2/pokemon/' + pokemonName).subscribe(
         (response: any) => {
