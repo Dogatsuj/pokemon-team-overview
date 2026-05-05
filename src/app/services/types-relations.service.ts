@@ -96,12 +96,16 @@ export class TypesRelationsService {
 
 
 
-    calculateTypeMultipliers(defenderTypes: Type[]): Map<Type, number> {
+    calculateTypeMultipliers(defenderTypes: Type[], immunities?: Type[]): Map<Type, number> {
         const multipliers = new Map<Type, number>();
 
         const allTypes: Type[] = Object.keys(this.typeChart) as Type[];
 
         for (const attackingType of allTypes) {
+            if (immunities?.includes(attackingType)) {
+                multipliers.set(attackingType, 0);
+                continue;
+            }
             let multiplier = 1;
             for (const defenderType of defenderTypes) {
                 const chart = this.typeChart[attackingType];

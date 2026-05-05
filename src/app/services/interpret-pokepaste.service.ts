@@ -3,6 +3,9 @@ import { Pokemon } from '../models/pokemon.model'
 import { PokeAPIService } from './poke-api.service';
 import { TypesRelationsService } from './types-relations.service';
 import { Router } from '@angular/router';
+import { Type } from '../models/types.model';
+
+
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +13,23 @@ import { Router } from '@angular/router';
 export class InterpretPokepasteService {
 
   constructor(private readonly pokepasteAPI: PokeAPIService, private readonly typesRelations: TypesRelationsService, private readonly router: Router) { }
+
+  private immunityAbilities: Map<string, Type> = new Map([
+    ['Levitate', 'ground'],
+    ['Water Absorb', 'water'],
+    ['Volt Absorb', 'electric'],
+    ['Flash Fire', 'fire'],
+    ['Sap Sipper', 'grass'],
+    ['Storm Drain', 'water'],
+    ['Dry Skin', 'water'],
+    ['Motor Drive', 'electric'],
+    ['Lightning Rod', 'electric'],
+    ['Earth Eater', 'ground'],
+    ['Wind Rider', 'flying'],
+    ['Well-Baked Body', 'fire'],
+    ['Thermal Exchange', 'fire'],
+    ['Purifying Salt', 'ghost'],
+  ]);
 
   async interpretPokepaste(pokepaste: String): Promise<Pokemon[]> {
     try {
@@ -223,7 +243,8 @@ export class InterpretPokepasteService {
   async setInfosOnPokemon(team: Pokemon[]): Promise<void> {
     for (const pokemon of team) {
       await this.pokepasteAPI.setInfosOnPokemon(pokemon).then(() => {
-        pokemon.typesRelations = this.typesRelations.calculateTypeMultipliers(pokemon.types);
+        const immunities = this.immunityAbilities.get(pokemon.ability) ? [this.immunityAbilities.get(pokemon.ability)!] : undefined;
+        pokemon.typesRelations = this.typesRelations.calculateTypeMultipliers(pokemon.types, immunities);
 
       });
     }
