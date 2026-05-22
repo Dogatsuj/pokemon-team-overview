@@ -73,6 +73,7 @@ export class InterpretPokepasteService {
       this.router.navigateByUrl('');
       return [];
     }
+
   }
 
 
@@ -130,6 +131,8 @@ export class InterpretPokepasteService {
       theFirstLine = firstLineParts[0];
 
     }
+
+    theFirstLine = theFirstLine.replace(/\s*\(([MF])\)\s*$/, '');
 
     if (this.pokemonHasNickname(theFirstLine)) {
       var nicknameAndName = theFirstLine.split('(');
@@ -239,6 +242,7 @@ export class InterpretPokepasteService {
   isAttack(lineOfThePaste: String): boolean {
     return lineOfThePaste.startsWith("-");
   }
+
 
   async setInfosOnPokemon(team: Pokemon[]): Promise<void> {
     for (const pokemon of team) {
