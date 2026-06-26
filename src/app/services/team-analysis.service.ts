@@ -42,7 +42,7 @@ export class TeamAnalysisService {
         'Wigglytuff': ['Normal'],
     };
 
-    tiers: Tier[] = [Tier.OU];
+    private tiers: Tier[] = [Tier.OU];
 
     constructor() {
         this.patchGenForPokeMMO();

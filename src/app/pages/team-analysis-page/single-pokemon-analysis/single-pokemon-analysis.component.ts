@@ -1,7 +1,7 @@
 import { Component, effect, input, Input } from '@angular/core';
-import { PokemonMatchups } from '../../../models/pokemon-matchup';
 import { CommonModule } from '@angular/common';
-import { PokemonCardComponent } from "../../../pokemon-card/pokemon-card.component";
+import { PokemonCardComponent } from '../../../pokemon-card/pokemon-card.component';
+import { PokemonMatchups } from '../../../models/pokemon-matchup';
 
 @Component({
   selector: 'app-single-pokemon-analysis',
