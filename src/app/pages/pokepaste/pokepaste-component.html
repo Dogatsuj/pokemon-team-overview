@@ -65,7 +65,11 @@
     </div>
 </div>
 
-<button class="copy-pokepaste" (click)="copyPokepaste()">Copy pokepaste</button>
+
+<div class="bottom-buttons">
+    <button (click)="copyPokepaste()">Copy pokepaste</button>
+    <button (click)="teamAnalysis(team)">Team analysis</button>
+</div>
 } @else {
 <p>Loading...</p>
 }

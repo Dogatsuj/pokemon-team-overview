@@ -1,0 +1,23 @@
+<app-tier-selector (tierChanged)="loadMatchups()"></app-tier-selector>
+
+<div class="team-analysis">
+<h2>Team analysis</h2>
+  <app-team-analysis [worstMatchups]="worstMatchups"></app-team-analysis>
+</div>
+
+<div class="per-pokemon-analysis">
+  <h2>Per pokemon analysis</h2>
+
+  <div class="tabs">
+    <div *ngFor="let tab of tabs; let i = index" class="tab" [class.active]="selectedTab === i"
+      (click)="selectedTab = i">
+      <img [src]="team![i].imageUrl" class="pokemon-image" />
+      {{tab}}
+
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <app-single-pokemon-analysis [matchups]="matchupsForEachPokemon[selectedTab]"></app-single-pokemon-analysis>
+  </div>
+</div>

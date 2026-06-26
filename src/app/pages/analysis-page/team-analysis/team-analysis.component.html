@@ -1,0 +1,60 @@
+<div class="worst-matchups-analysis">
+
+    <div class="column">
+
+        <h3>Worst Matchups</h3>
+
+        <div class="list">
+
+            @for (matchup of (worstMatchups() | slice:0:nbMatchups); track matchup.threat.name) {
+
+            <div class="pokemon-row">
+
+                <app-pokemon-card [pokemon]="matchup.threat" />
+
+                <div class="team-matchups">
+
+                    @for (response of matchup.teamMatchups; track response.pokemon.name) {
+
+                    <div class="team-matchup">
+
+                        <div class="pokemon-name">
+                            {{ response.pokemon.name }}
+                        </div>
+
+                        <div class="moves">
+                            <div>Deals
+                               <strong>{{ response.matchup.bestMoveFrom.damage[0] }}-{{
+                                response.matchup.bestMoveFrom.damage[1] }}%</strong>
+                                with
+                                <strong>{{ response.matchup.bestMoveFrom.move }}</strong>
+                                
+                            </div>
+                            <div>Takes
+                                <strong>{{ response.matchup.bestMoveAgainst.damage[0] }}-{{
+                                response.matchup.bestMoveAgainst.damage[1] }}%</strong>
+                                From
+                                <strong>{{ response.matchup.bestMoveAgainst.move }}</strong>
+                                
+                            </div>
+                        </div>
+
+                    </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+            }
+
+        </div>
+
+    </div>
+
+    <button (click)="nbMatchups = nbMatchups + 10">
+        Load more
+    </button>
+
+</div>

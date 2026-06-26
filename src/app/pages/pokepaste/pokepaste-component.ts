@@ -56,7 +56,7 @@ export class PokepasteComponent implements OnInit {
   }
 
   setAverageRelations() {
-    
+
     const relationSums: Map<string, number> = new Map();
     const relationCounts: Map<string, number> = new Map();
 
@@ -86,7 +86,9 @@ export class PokepasteComponent implements OnInit {
     });
   }
 
-
+  teamAnalysis(team: Pokemon[]) {
+    this.router.navigate(['/team-analysis'], { state: { team } });
+  }
 }
 
 

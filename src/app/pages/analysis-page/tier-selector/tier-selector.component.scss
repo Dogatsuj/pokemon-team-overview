@@ -1,0 +1,40 @@
+@use 'variables' as *;
+
+::ng-deep body {
+
+    .tier-selector {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        padding: .75rem 1rem;
+        border-radius: .5rem;
+        background-color: $bg-secondary-light;
+    }
+
+    .tier-selector label {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 500;
+    }
+
+    .tier-selector input[type="checkbox"] {
+        cursor: pointer;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    &.dark {
+
+        .tier-selector {
+            background-color: $bg-secondary-dark;
+        }
+
+    }
+}
+p{
+    margin-bottom: 0;
+}

@@ -21,7 +21,7 @@
                 <p class="card-text"><strong>Ability:</strong> {{ pokemon.ability }}</p>
                 <span class="item-wrapper">
                     <p class="card-text"><strong>Held Item:</strong> {{ pokemon.heldItem || 'None' }}</p>
-                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/{{formatItemName(pokemon.heldItem)}}.png" alt="item image">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/{{formatItemName(pokemon.heldItem)}}.png" alt="">
                 </span>
             </span>
             <p class="evs"> Evs : {{pokemon.getEVsHTMLText()}}</p>
@@ -30,7 +30,7 @@
                 <div *ngFor="let move of pokemon.moves" class="move-wrapper" (click)="openMoveDetails(move)">
                     <p>{{ move }}</p>
                     <img class="moveImage" [src]="'assets/moves/' + movesAndTypes[move] + '.png'"
-                        alt="image of the type" />
+                        alt="" />
                 </div>
             </span>
         </div>

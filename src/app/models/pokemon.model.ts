@@ -45,4 +45,52 @@ export class Pokemon {
     }
     return text;
   }
+
+  getEffectiveSpeed(): number {
+  const baseSpeed = this.baseStats["Spe"];
+  const iv = this.ivs["Spe"];
+  const ev = this.evs["Spe"];
+
+  let speed = Math.floor(
+    ((2 * baseSpeed + iv + Math.floor(ev / 4)) * this.level) / 100
+  ) + 5;
+
+  const positiveSpeedNatures = [
+    "Timid",
+    "Jolly",
+    "Hasty",
+    "Naive"
+  ];
+
+  const negativeSpeedNatures = [
+    "Brave",
+    "Relaxed",
+    "Quiet",
+    "Sassy"
+  ];
+
+  if (positiveSpeedNatures.includes(this.nature)) {
+    speed = Math.floor(speed * 1.1);
+  } else if (negativeSpeedNatures.includes(this.nature)) {
+    speed = Math.floor(speed * 0.9);
+  }
+
+  const speedItems: { [key: string]: number } = {
+    "Choice Scarf": 1.5,
+    "Iron Ball": 0.5,
+    "Macho Brace": 0.5,
+    "Power Anklet": 0.5,
+    "Power Band": 0.5,
+    "Power Belt": 0.5,
+    "Power Bracer": 0.5,
+    "Power Lens": 0.5,
+    "Power Weight": 0.5
+  };
+
+  if (speedItems[this.heldItem] !== undefined) {
+    speed = Math.floor(speed * speedItems[this.heldItem]);
+  }
+
+  return speed;
+}
 }

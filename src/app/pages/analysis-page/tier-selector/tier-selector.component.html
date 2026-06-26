@@ -1,0 +1,12 @@
+<div class="tier-selector">
+    <p>Tiers :</p>
+    @for (tier of tiers; track tier) {
+        <label>
+            <input
+                type="checkbox"
+                [checked]="selectedTiers().includes(tier)"
+                (change)="toggleTier(tier)">
+            {{ tier }}
+        </label>
+    }
+</div>
