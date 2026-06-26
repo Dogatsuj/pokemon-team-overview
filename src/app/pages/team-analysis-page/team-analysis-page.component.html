@@ -1,0 +1,21 @@
+<h2>Per pokemon analysis</h2>
+
+@for (bestAndWorstMatchupsForAPokemon of bestAndWorstMatchupsForEachPokemon; track bestAndWorstMatchupsForAPokemon.pokemon.name) {
+
+  <h3>{{ bestAndWorstMatchupsForAPokemon.pokemon.name }}</h3>
+
+  <h4>Best matchups</h4>
+  <ul>
+    @for (entry of bestAndWorstMatchupsForAPokemon.bestMatchups; track entry[0].name) {
+      <li>{{ entry[0].name }} ({{ entry[1].matchupScore }})</li>
+    }
+  </ul>
+
+  <h4>Worst matchups</h4>
+  <ul>
+    @for (entry of bestAndWorstMatchupsForAPokemon.worstMatchups; track entry[0].name) {
+      <li>{{ entry[0].name }} ({{ entry[1].matchupScore }})</li>
+    }
+  </ul>
+
+}

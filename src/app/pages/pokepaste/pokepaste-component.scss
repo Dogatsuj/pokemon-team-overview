@@ -90,13 +90,6 @@
 
 }
 
-.copy-pokepaste {
-    border-radius: 5px;
-    text-align: center;
-    width: 10%;
-    margin-left: 45%;
-}
-
 h3 {
     text-align: center;
     margin-top: 25px;
@@ -163,4 +156,19 @@ h3 {
         height: 20px;
         border-radius: 0 !important;
     }
+}
+
+.bottom-buttons{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    button {
+    border-radius: 5px;
+    text-align: center;
+    width: 10%;
+    margin-inline: 1%;
+}
 }
