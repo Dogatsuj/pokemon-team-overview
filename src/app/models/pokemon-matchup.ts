@@ -15,7 +15,7 @@ export class PokemonMatchups {
         this.matchups.set(opponent, matchup);
     }
 
-    getBestMatchups(numberOfMatchups: number = 10): PokemonMatchups {
+    getBestMatchups(numberOfMatchups: number = 20): PokemonMatchups {
 
         const sortedEntries = Array.from(this.matchups.entries())
             .map(([opponent, matchup]) => {
@@ -44,7 +44,7 @@ export class PokemonMatchups {
         return result;
     }
 
-    getWorstMatchups(numberOfMatchups: number = 10): PokemonMatchups {
+    getWorstMatchups(numberOfMatchups: number = 20): PokemonMatchups {
 
         const sortedEntries = Array.from(this.matchups.entries())
             .map(([opponent, matchup]) => {

@@ -32,7 +32,7 @@
             @if(movesAndTypes){
             <div *ngFor="let move of pokemon.moves" class="move-wrapper" (click)="openMoveDetails(move)">
                 <p>{{ move }}</p>
-                <img class="moveImage" [src]="'assets/moves/' + movesAndTypes[move] + '.png'" alt="image of the type" />
+                <img class="moveImage" [src]="'assets/moves/' + movesAndTypes[move] + '.png'" alt="" />
             </div>
             }
         </div>

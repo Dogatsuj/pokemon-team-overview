@@ -1,0 +1,47 @@
+<div class="matchup-analysis">
+
+    <h2 class="pokemon-title">
+        {{ matchups()?.pokemon?.name }}
+    </h2>
+
+    <div class="columns">
+
+        <div class="column">
+            <h3>Best Matchups</h3>
+
+            <div class="list">
+                <div
+                    class="pokemon-row"
+                    *ngFor="let matchup of matchups()?.getBestMatchups(nbMatchups)?.matchups | keyvalue">
+                    
+                    <app-pokemon-card [pokemon]="matchup.key"/>
+                    
+                    <p>Deals {{matchup.value.bestMoveAgainst.damage[0]}}-{{matchup.value.bestMoveAgainst.damage[1]}}% with {{matchup.value.bestMoveAgainst.move}}</p>
+                    <p>Takes {{matchup.value.bestMoveFrom.damage[0]}}-{{matchup.value.bestMoveFrom.damage[1]}}% from {{matchup.value.bestMoveFrom.move}}</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="column">
+            <h3>Worst Matchups</h3>
+
+            <div class="list">
+                <div
+                    class="pokemon-row"
+                    *ngFor="let matchup of matchups()?.getWorstMatchups(nbMatchups)?.matchups | keyvalue">
+
+                    <app-pokemon-card [pokemon]="matchup.key"/>
+                    <p>Deals {{matchup.value.bestMoveAgainst.damage[0]}}-{{matchup.value.bestMoveAgainst.damage[1]}}% with {{matchup.value.bestMoveAgainst.move}}</p>
+                    <p>Takes {{matchup.value.bestMoveFrom.damage[0]}}-{{matchup.value.bestMoveFrom.damage[1]}}% from {{matchup.value.bestMoveFrom.move}}</p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <button (click)="nbMatchups=nbMatchups + 10">Load more</button>
+
+</div>

@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Pokemon } from '../models/pokemon.model';
 import { PokeAPIService } from '../services/poke-api.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { SharePokemonService } from '../services/share-pokemon.service';
 
 @Component({

@@ -135,69 +135,22 @@ export class TeamAnalysisService {
         }
     }
 
-    // ---------------------------------------------------------------------------
-    // Public API
-    // ---------------------------------------------------------------------------
-
-    async analyseTeam(team: Pokemon[]) {
-        await this.waitForSetsLoaded();
-        const matchups: PokemonMatchups[] = this.calculateMatchups(team);
-        const worstMatchups: PokemonMatchups[] = this.getWorstMatchups(matchups);
-        const bestMatchups: PokemonMatchups[] = this.getBestMatchups(matchups);
-        console.log('worst')
-        console.log(worstMatchups);
-        console.log('best')
-        console.log(bestMatchups);
-
-    }
-
-    async getBestAndWorstMatchups(team: Pokemon[]): Promise<BestAndWorstMatchupsForAPokemon[]>{
-        await this.waitForSetsLoaded();
-        var bestAndWorst: BestAndWorstMatchupsForAPokemon[] = [];
-        const allMatchups: PokemonMatchups[] = this.calculateMatchups(team);
-        allMatchups.forEach((pokemonMatchups: PokemonMatchups) => {
-            bestAndWorst.push({
-                pokemon: pokemonMatchups.pokemon,
-                bestMatchups: pokemonMatchups.getBestMatchups().matchups,
-                worstMatchups: pokemonMatchups.getWorstMatchups().matchups
-            });
-        });
-        return bestAndWorst;
-    }
-
-    private async waitForSetsLoaded(): Promise<void> {
-    let recursions = 0;
-
-    while (!this.setsLoaded) {
-        if (recursions++ > 100) {
-            throw new Error('Sets failed to load');
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 200));
-    }
-}
-
-    private getWorstMatchups(allMatchups: PokemonMatchups[], numberOfMatchups: number = 10): PokemonMatchups[] {
-        var worstMatchups: PokemonMatchups[] = [];
-
-        allMatchups.forEach((pokemonMatchups: PokemonMatchups) => {
-            worstMatchups.push(pokemonMatchups.getWorstMatchups(numberOfMatchups));
-        });
-        return worstMatchups;
-    }
- 
-    private getBestMatchups(allMatchups: PokemonMatchups[], numberOfMatchups: number = 10): PokemonMatchups[] {
-        var bestMatchups: PokemonMatchups[] = [];
-
-        allMatchups.forEach((pokemonMatchups: PokemonMatchups) => {
-            bestMatchups.push(pokemonMatchups.getBestMatchups(numberOfMatchups));
-        });
-        return bestMatchups;
-    }
 
     // ---------------------------------------------------------------------------
     // Sets loading
     // ---------------------------------------------------------------------------
+
+    private async waitForSetsLoaded(): Promise<void> {
+        let recursions = 0;
+
+        while (!this.setsLoaded) {
+            if (recursions++ > 100) {
+                throw new Error('Sets failed to load');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
 
     private async loadSets() {
         try {
@@ -264,7 +217,6 @@ export class TeamAnalysisService {
                             const p = new Pokemon();
 
                             p.name = species;
-                            p.nickname = setName;
                             p.ability = s.ability || '';
                             p.nature = s.nature || '';
                             p.level = s.level || p.level;
@@ -299,6 +251,8 @@ export class TeamAnalysisService {
                                 ? s.moves.slice(0, 4)
                                 : [];
 
+                            p.imageUrl = `https://play.pokemonshowdown.com/sprites/gen5/${species.toLocaleLowerCase()}.png`
+
                             sets.push(p);
                         }
                     }
@@ -317,47 +271,40 @@ export class TeamAnalysisService {
     // Matchup calculation
     // ---------------------------------------------------------------------------
 
-    private calculateMatchups(team: Pokemon[]): PokemonMatchups[] {
-        const matchups: PokemonMatchups[] = [];
+    async calculateMatchups(pokemon: Pokemon): Promise<PokemonMatchups> {
+    await this.waitForSetsLoaded()
+    const safePokemon = Object.assign(new Pokemon(), pokemon);
+    const pokemonMatchups = new PokemonMatchups(safePokemon);
 
-        if (!this.sets || this.sets.length === 0) {
-            return matchups;
-        }
-
-        team.forEach((pokemon: Pokemon) => {
-
-            const safePokemon = Object.assign(new Pokemon(), pokemon);
-
-            const pokemonMatchups = new PokemonMatchups(safePokemon);
-
-            this.sets.forEach((setPokemon: Pokemon) => {
-                const offensiveMoves = pokemon.moves
-                    .filter((move) => !!move)
-                    .map((move) => ({
-                        move,
-                        damage: this.damagesFromMove(move, pokemon, setPokemon)
-                    }));
-
-                const defensiveMoves = setPokemon.moves
-                    .filter((move) => !!move)
-                    .map((move) => ({
-                        move,
-                        damage: this.damagesFromMove(move, setPokemon, pokemon)
-                    }));
-
-                const matchup = new Matchup(
-                    this.selectBestMove(offensiveMoves),
-                    this.selectBestMove(defensiveMoves)
-                );
-
-                pokemonMatchups.addMatchup(setPokemon, matchup);
-            });
-
-            matchups.push(pokemonMatchups);
-        });
-
-        return matchups;
+    if (!this.sets || this.sets.length === 0) {
+        return pokemonMatchups;
     }
+
+    this.sets.forEach((setPokemon: Pokemon) => {
+        const offensiveMoves = pokemon.moves
+            .filter((move) => !!move)
+            .map((move) => ({
+                move,
+                damage: this.damagesFromMove(move, pokemon, setPokemon),
+            }));
+
+        const defensiveMoves = setPokemon.moves
+            .filter((move) => !!move)
+            .map((move) => ({
+                move,
+                damage: this.damagesFromMove(move, setPokemon, pokemon),
+            }));
+
+        const matchup = new Matchup(
+            this.selectBestMove(offensiveMoves),
+            this.selectBestMove(defensiveMoves)
+        );
+
+        pokemonMatchups.addMatchup(setPokemon, matchup);
+    });
+
+    return pokemonMatchups;
+}
 
 
     private selectBestMove(
@@ -425,7 +372,7 @@ export class TeamAnalysisService {
             return [Math.min(...damagePercentages), Math.max(...damagePercentages)];
 
         } catch (e) {
-            console.warn(`Calcul échoué pour le move "${move}" (${attacker.name} → ${defender.name}):`, e);
+            console.warn(`Failed to calc move "${move}" (${attacker.name} → ${defender.name}):`, e);
             return [0, 0];
         }
     }
