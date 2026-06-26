@@ -17,6 +17,14 @@ export type BestAndWorstMatchupsForAPokemon = {
     worstMatchups: Map<Pokemon, Matchup>;
 }
 
+export type TeamWorstMatchup = {
+    threat: Pokemon;
+    teamMatchups: {
+        pokemon: Pokemon;
+        matchup: Matchup;
+    }[];
+};
+
 @Injectable({
     providedIn: 'root'
 })
@@ -272,39 +280,39 @@ export class TeamAnalysisService {
     // ---------------------------------------------------------------------------
 
     async calculateMatchups(pokemon: Pokemon): Promise<PokemonMatchups> {
-    await this.waitForSetsLoaded()
-    const safePokemon = Object.assign(new Pokemon(), pokemon);
-    const pokemonMatchups = new PokemonMatchups(safePokemon);
+        await this.waitForSetsLoaded()
+        const safePokemon = Object.assign(new Pokemon(), pokemon);
+        const pokemonMatchups = new PokemonMatchups(safePokemon);
 
-    if (!this.sets || this.sets.length === 0) {
+        if (!this.sets || this.sets.length === 0) {
+            return pokemonMatchups;
+        }
+
+        this.sets.forEach((setPokemon: Pokemon) => {
+            const offensiveMoves = pokemon.moves
+                .filter((move) => !!move)
+                .map((move) => ({
+                    move,
+                    damage: this.damagesFromMove(move, pokemon, setPokemon),
+                }));
+
+            const defensiveMoves = setPokemon.moves
+                .filter((move) => !!move)
+                .map((move) => ({
+                    move,
+                    damage: this.damagesFromMove(move, setPokemon, pokemon),
+                }));
+
+            const matchup = new Matchup(
+                this.selectBestMove(offensiveMoves),
+                this.selectBestMove(defensiveMoves)
+            );
+
+            pokemonMatchups.addMatchup(setPokemon, matchup);
+        });
+
         return pokemonMatchups;
     }
-
-    this.sets.forEach((setPokemon: Pokemon) => {
-        const offensiveMoves = pokemon.moves
-            .filter((move) => !!move)
-            .map((move) => ({
-                move,
-                damage: this.damagesFromMove(move, pokemon, setPokemon),
-            }));
-
-        const defensiveMoves = setPokemon.moves
-            .filter((move) => !!move)
-            .map((move) => ({
-                move,
-                damage: this.damagesFromMove(move, setPokemon, pokemon),
-            }));
-
-        const matchup = new Matchup(
-            this.selectBestMove(offensiveMoves),
-            this.selectBestMove(defensiveMoves)
-        );
-
-        pokemonMatchups.addMatchup(setPokemon, matchup);
-    });
-
-    return pokemonMatchups;
-}
 
 
     private selectBestMove(
@@ -375,6 +383,69 @@ export class TeamAnalysisService {
             console.warn(`Failed to calc move "${move}" (${attacker.name} → ${defender.name}):`, e);
             return [0, 0];
         }
+    }
+
+    async teamsWorstMatchups(team: Pokemon[]): Promise<TeamWorstMatchup[]> {
+        await this.waitForSetsLoaded();
+
+        if (!this.sets || this.sets.length === 0 || !team || team.length === 0) {
+            return [];
+        }
+
+        const safeTeam = team.map((p) => Object.assign(new Pokemon(), p));
+        const results: TeamWorstMatchup[] = [];
+
+        this.sets.forEach((threat: Pokemon) => {
+
+            const teamMatchups: TeamWorstMatchup['teamMatchups'] = safeTeam
+                .map((member) => ({
+                    pokemon: member,
+                    matchup: this.buildMatchup(member, threat)
+                }))
+                .sort(
+                    (a, b) =>
+                        (a.matchup.matchupScore ?? 100) -
+                        (b.matchup.matchupScore ?? 100)
+                );
+
+            results.push({
+                threat,
+                teamMatchups
+            });
+        });
+
+        return results.sort(
+            (a, b) =>
+                (b.teamMatchups[0]?.matchup.matchupScore ?? 100) -
+                (a.teamMatchups[0]?.matchup.matchupScore ?? 100)
+        );
+    }
+
+    private buildMatchup(pokemon: Pokemon, opponent: Pokemon): Matchup {
+        const offensiveMoves = pokemon.moves
+            .filter((move) => !!move)
+            .map((move) => ({
+                move,
+                damage: this.damagesFromMove(move, pokemon, opponent),
+            }));
+
+        const defensiveMoves = opponent.moves
+            .filter((move) => !!move)
+            .map((move) => ({
+                move,
+                damage: this.damagesFromMove(move, opponent, pokemon),
+            }));
+
+        const matchup = new Matchup(
+            this.selectBestMove(defensiveMoves),
+            this.selectBestMove(offensiveMoves)
+        );
+
+        matchup.calculateMatchupScore(
+            opponent.getEffectiveSpeed() > pokemon.getEffectiveSpeed()
+        );
+
+        return matchup;
     }
 
 }

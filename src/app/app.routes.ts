@@ -4,7 +4,7 @@ import { MovePageComponent } from './pages/move-page/move-page.component';
 import { MyTeamsComponent } from './pages/my-teams/my-teams.component';
 import { PokepasteComponent } from './pages/pokepaste/pokepaste-component';
 import { PokemonPageComponent } from './pages/pokemon-page/pokemon-page.component';
-import { TeamAnalysisPageComponent } from './pages/team-analysis-page/team-analysis-page.component';
+import { AnalysisPageComponent } from './pages/analysis-page/analysis-page.component';
 
 
 export const routes: Routes = [
@@ -13,5 +13,5 @@ export const routes: Routes = [
     {path: 'my-teams', component: MyTeamsComponent},
     {path: 'pokemon', component: PokemonPageComponent},
     { path: 'move/:name', component: MovePageComponent },
-    {path: 'team-analysis', component: TeamAnalysisPageComponent}
+    {path: 'team-analysis', component: AnalysisPageComponent}
 ];
