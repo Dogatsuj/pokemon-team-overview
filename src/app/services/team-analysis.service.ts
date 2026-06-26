@@ -174,7 +174,7 @@ export class TeamAnalysisService {
                 }
             };
 
-            const toStatObj = (obj: any): { [key: string]: number } => {
+            const toEVs = (obj: any): { [key: string]: number } => {
                 const out: { [key: string]: number } = {
                     HP: 0,
                     Atk: 0,
@@ -189,7 +189,30 @@ export class TeamAnalysisService {
                 for (const k of Object.keys(obj)) {
                     const mapped = mapKey(k);
 
-                    if (Object.prototype.hasOwnProperty.call(out, mapped)) {
+                    if (mapped in out) {
+                        out[mapped] = obj[k];
+                    }
+                }
+
+                return out;
+            };
+
+            const toIVs = (obj: any): { [key: string]: number } => {
+                const out: { [key: string]: number } = {
+                    HP: 31,
+                    Atk: 31,
+                    Def: 31,
+                    SpA: 31,
+                    SpD: 31,
+                    Spe: 31
+                };
+
+                if (!obj) return out;
+
+                for (const k of Object.keys(obj)) {
+                    const mapped = mapKey(k);
+
+                    if (mapped in out) {
                         out[mapped] = obj[k];
                     }
                 }
@@ -227,8 +250,9 @@ export class TeamAnalysisService {
                             p.name = species;
                             p.ability = s.ability || '';
                             p.nature = s.nature || '';
-                            p.level = s.level || p.level;
-                            p.evs = Object.assign(p.evs, toStatObj(s.evs));
+                            p.level = 50;
+                            p.evs = toEVs(s.evs);
+                            p.ivs = toIVs(s.ivs);
 
                             const speciesId = toID(species);
                             const speciesData = this.gen.species.get(speciesId as ID);
@@ -248,7 +272,7 @@ export class TeamAnalysisService {
                             p.heldItem = rawItem;
 
                             if (s.ivs) {
-                                const ivObj = toStatObj(s.ivs);
+                                const ivObj = toIVs(s.ivs);
 
                                 for (const k of Object.keys(ivObj)) {
                                     p.ivs[k] = ivObj[k] !== 0 ? ivObj[k] : 0;
@@ -437,8 +461,8 @@ export class TeamAnalysisService {
             }));
 
         const matchup = new Matchup(
-            this.selectBestMove(defensiveMoves),
-            this.selectBestMove(offensiveMoves)
+            this.selectBestMove(offensiveMoves),
+            this.selectBestMove(defensiveMoves)
         );
 
         matchup.calculateMatchupScore(
