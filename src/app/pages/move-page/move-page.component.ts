@@ -29,6 +29,7 @@ export class MovePageComponent {
     this.pokeApiService.getMoveInfo(moveName).pipe(take(1)).subscribe({
       next: data => {
       this.move = new Move(data);
+      
 
       const moveType = this.move.type.name as Type;
       if (this.move.damage_class.name !== 'status') {

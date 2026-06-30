@@ -284,7 +284,7 @@ export class TeamAnalysisService {
                                 : [];
 
                             p.imageUrl = `https://play.pokemonshowdown.com/sprites/gen5/${species.toLocaleLowerCase()}.png`
-
+                            //TODO add types ?
                             sets.push(p);
                         }
                     }
@@ -308,9 +308,7 @@ export class TeamAnalysisService {
         const safePokemon = Object.assign(new Pokemon(), pokemon);
         const pokemonMatchups = new PokemonMatchups(safePokemon);
 
-        if (!this.sets || this.sets.length === 0) {
-            return pokemonMatchups;
-        }
+        if (!this.sets) return pokemonMatchups;            
 
         this.sets.forEach((setPokemon: Pokemon) => {
             const offensiveMoves = pokemon.moves
@@ -350,64 +348,94 @@ export class TeamAnalysisService {
             , moves[0]);
     }
 
-    private damagesFromMove(move: string, attacker: Pokemon, defender: Pokemon): [number, number] {
-        const gen = this.gen;
-        const level = 50;
+    private damagesFromMove(
+    move: string,
+    attacker: Pokemon,
+    defender: Pokemon
+): [number, number] {
+    const gen = this.gen;
+    const level = 50;
 
-        const resolveItem = (item: string): string | undefined =>
-            (item?.trim()) || undefined;
+    const resolveItem = (item: string): string | undefined =>
+        item?.trim() || undefined;
 
-        try {
-            const smogonAttacker = new SmogonPokemon(gen, attacker.name, {
-                level,
-                item: resolveItem(attacker.heldItem),
-                nature: attacker.nature,
-                evs: attacker.evs,
-                ivs: attacker.ivs,
-            });
+    const normalizeStats = (
+        stats?: { [key: string]: number }
+    ): Partial<Record<'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe', number>> => ({
+        hp: stats?.['HP'] ?? 0,
+        atk: stats?.['Atk'] ?? 0,
+        def: stats?.['Def'] ?? 0,
+        spa: stats?.['SpA'] ?? 0,
+        spd: stats?.['SpD'] ?? 0,
+        spe: stats?.['Spe'] ?? 0,
+    });
 
-            const smogonDefender = new SmogonPokemon(gen, defender.name, {
-                level,
-                item: resolveItem(defender.heldItem),
-                nature: defender.nature,
-                evs: defender.evs,
-                ivs: defender.ivs,
-            });
+    try {
+        const smogonAttacker = new SmogonPokemon(gen, attacker.name, {
+            level,
+            ability: attacker.ability,
+            item: resolveItem(attacker.heldItem),
+            nature: attacker.nature,
+            evs: normalizeStats(attacker.evs),
+            ivs: normalizeStats(attacker.ivs),
+        });
 
-            // Apply PokeMMO Gen5 types (undoes Fairy retyping from Gen6)
-            this.applyPokeMMOTypes(smogonAttacker, attacker.name);
-            this.applyPokeMMOTypes(smogonDefender, defender.name);
+        const smogonDefender = new SmogonPokemon(gen, defender.name, {
+            level,
+            ability: defender.ability,
+            item: resolveItem(defender.heldItem),
+            nature: defender.nature,
+            evs: normalizeStats(defender.evs),
+            ivs: normalizeStats(defender.ivs),
+        });
 
-            const smogonMove = new Move(gen, move);
+        // Apply PokeMMO Gen5 types (undoes Fairy retyping from Gen6)
+        this.applyPokeMMOTypes(smogonAttacker, attacker.name);
+        this.applyPokeMMOTypes(smogonDefender, defender.name);
 
-            // Status moves deal no direct damage
-            if (smogonMove.category === 'Status') {
-                return [0, 0];
-            }
+        const smogonMove = new Move(gen, move);
 
-            const result = calculate(gen, smogonAttacker, smogonDefender, smogonMove);
-
-            const defenderHp = smogonDefender.stats.hp;
-            const damageValues = (() => {
-                const damage = result.damage;
-                if (typeof damage === 'number') return [damage];
-                if (Array.isArray(damage)) return damage.flat(Infinity) as number[];
-                return [];
-            })();
-
-            if (damageValues.length === 0) return [0, 0];
-
-            const damagePercentages = damageValues.map(
-                (damage) => Math.round((damage / defenderHp) * 1000) / 10
-            );
-
-            return [Math.min(...damagePercentages), Math.max(...damagePercentages)];
-
-        } catch (e) {
-            console.warn(`Failed to calc move "${move}" (${attacker.name} → ${defender.name}):`, e);
+        // Status moves deal no direct damage
+        if (smogonMove.category === 'Status') {
             return [0, 0];
         }
+
+        const result = calculate(
+            gen,
+            smogonAttacker,
+            smogonDefender,
+            smogonMove
+        );
+
+        const defenderHp = smogonDefender.stats.hp;
+
+        const damageValues = (() => {
+            const damage = result.damage;
+            if (typeof damage === 'number') return [damage];
+            if (Array.isArray(damage)) return damage.flat(Infinity) as number[];
+            return [];
+        })();
+
+        if (damageValues.length === 0) {
+            return [0, 0];
+        }
+
+        const damagePercentages = damageValues.map(
+            damage => Math.round((damage / defenderHp) * 1000) / 10
+        );
+
+        return [
+            Math.min(...damagePercentages),
+            Math.max(...damagePercentages),
+        ];
+    } catch (e) {
+        console.warn(
+            `Failed to calc move "${move}" (${attacker.name} → ${defender.name}):`,
+            e
+        );
+        return [0, 0];
     }
+}
 
     async teamsWorstMatchups(team: Pokemon[]): Promise<TeamWorstMatchup[]> {
         await this.waitForSetsLoaded();
