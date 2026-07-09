@@ -1092,32 +1092,6 @@ var SETDEX = {
 			moves: ["Toxic Spikes", "Spikes", "Gunk Shot", "Payback"],
 		},
 	},
-	Gallade: {
-		"Choice Scarf": {
-			level: 50,
-			ability: "Sharpness",
-			item: "Choice Scarf",
-			nature: "Jolly",
-			evs: { hp: 4, at: 252, sp: 252 },
-			moves: ["Leaf blade", "Psycho Cut", "Close Combat", "Trick"],
-		},
-		"Swords Dance": {
-			level: 50,
-			ability: "Sharpness",
-			item: "Life Orb",
-			nature: "Adamant",
-			evs: { hp: 4, at: 252, sp: 252 },
-			moves: ["Leaf blade", "Psycho Cut", "Close Combat", "Swords Dance"],
-		},
-		"Choice Band": {
-			level: 50,
-			ability: "Sharpness",
-			item: "Leftovers",
-			nature: "Adamant",
-			evs: { hp: 4, at: 252, sp: 252 },
-			moves: ["Leaf blade", "Psycho Cut", "Close Combat", "Trick"],
-		},
-	},
 	Gardevoir: {
 		Support: {
 			level: 50,
